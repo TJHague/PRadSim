@@ -36,7 +36,7 @@ INCDIRS     := $(patsubst %,-I%,$(subst :, ,$(INCDIR)))
 CFLAGS      := -Wall -fPIC -O3 -g $(MODE) $(INCDIRS)
 CXXFLAGS    := -Wall -fPIC -O3 -g $(MODE) $(INCDIRS)
 FFLAGS      := -Wall -fPIC -O3 -g $(MODE) $(INCDIRS)
-CXXFLAGS    += -std=c++11
+CXXFLAGS    += -std=c++17
 FFLAGS      += -cpp -ffixed-line-length-none
 GPPFLAGS    := -MM
 LDFLAGS     := -O3 -g $(MODE)
