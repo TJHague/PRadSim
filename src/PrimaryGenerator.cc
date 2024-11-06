@@ -781,7 +781,7 @@ void X17PrimaryGenerator::Register(TTree *tree)
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-X17PrimaryGenerator::GeneratePrimaryVertex(G4Event *event)
+void X17PrimaryGenerator::GeneratePrimaryVertex(G4Event *event)
 {
     if (!fRegistered)
     {
