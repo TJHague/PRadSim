@@ -87,6 +87,9 @@ private:
     G4VPhysicalVolume *DefinePRadVolumes();
     void DefinePRadSDs();
 
+    G4VPhysicalVolume *DefineX17Volumes();
+    void DefineX17SDs();
+
     G4VPhysicalVolume *DefineDRadVolumes();
     void DefineDRadSDs();
 
