@@ -165,7 +165,7 @@ class X17PrimaryGenerator : public PRadPrimaryGenerator
     protected:
     void Register(TTree *);
     double fWeight;
-}
+};
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 

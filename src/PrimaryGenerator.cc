@@ -781,7 +781,7 @@ void X17PrimaryGenerator::Register(TTree *tree)
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void X17PrimaryGenerator::GeneratePrimaryVertex(G4Event *event)
+void X17PrimaryGenerator::GeneratePrimaryVertex(G4Event *anEvent)
 {
     if (!fRegistered)
     {
@@ -824,19 +824,19 @@ void X17PrimaryGenerator::GeneratePrimaryVertex(G4Event *event)
         if(i%2==0)
         {
             // First and third particles read in are electrons (i==0 and i==2)
-            pdg = particleTable->FindParticle("e-").GetPDGEncoding();
+            pdg = particleTable->FindParticle("e-")->GetPDGEncoding();
         }
         else
         {
             // Second particle read in is positron (i==1)
-            pdg = particleTable->FindParticle("e-").GetAntiPDGEncoding();
+            pdg = particleTable->FindParticle("e-")->GetAntiPDGEncoding();
         }
         G4PrimaryParticle *particleL = new G4PrimaryParticle(pdg, epx[i], epy[i], epz[i]);
         G4PrimaryVertex *vertexL = new G4PrimaryVertex(x, y, z, 0);
         vertexL->SetPrimary(particleL);
         anEvent->AddPrimaryVertex(vertexL);
 
-        fPID[fN] = pid[i];
+        fPID[fN] = pdg;
         fX[fN] = x;
         fY[fN] = y;
         fZ[fN] = z;
