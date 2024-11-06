@@ -453,7 +453,6 @@ G4VPhysicalVolume *DetectorConstruction::DefineX17Volumes()
 
     G4double TargetR = fTargetR;
     G4double TargetHalfL = fTargetHalfL;
-    G4Material *TargetM = G4Material::GetMaterial("H2Gas");
     if (fTargetMat == "LH2"){
         TargetM = G4Material::GetMaterial("H2Liquid");
         G4cout<<"using "<<fTargetHalfL*2.<<" mm long liquid hydrogen target, with radius "<<fTargetR<<" mm"<<G4endl;
@@ -477,8 +476,6 @@ G4VPhysicalVolume *DetectorConstruction::DefineX17Volumes()
     new G4PVPlacement(0, G4ThreeVector(0, 0, fTargetCenter), logicTargetCon, "Target Container", logicWorld, false, 0);
 
     // Target material
-    G4double TargetR = 25.0 * mm;
-    G4double TargetHalfL = 20.0 * mm;
     G4VSolid *solidTarget = new G4Tubs("TargetS", 0, TargetR, TargetHalfL, 0, twopi);
     G4LogicalVolume *logicTarget = new G4LogicalVolume(solidTarget, TargetM, "TargetLV");
     new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logicTarget, "Target Material", logicTargetCon, false, 0);
