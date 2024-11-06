@@ -94,7 +94,8 @@ PrimaryGenerator::PrimaryGenerator() : G4VPrimaryGenerator(), fRegistered(false)
 {
     fN = 0;
 
-    for (int i = 0; i < MaxN; i++) {
+    for (int i = 0; i < MaxN; i++)
+    {
         fPID[i] = -9999;
         fX[i] = 1e+38;
         fY[i] = 1e+38;
@@ -118,7 +119,8 @@ PrimaryGenerator::PrimaryGenerator(G4String type, G4double e, G4double x, G4doub
 
     fN = 0;
 
-    for (int i = 0; i < MaxN; i++) {
+    for (int i = 0; i < MaxN; i++)
+    {
         fPID[i] = -9999;
         fX[i] = 1e+38;
         fY[i] = 1e+38;
@@ -142,7 +144,8 @@ PrimaryGenerator::PrimaryGenerator(G4String type, G4double e, G4double thlo, G4d
 
     fN = 0;
 
-    for (int i = 0; i < MaxN; i++) {
+    for (int i = 0; i < MaxN; i++)
+    {
         fPID[i] = -9999;
         fX[i] = 1e+38;
         fY[i] = 1e+38;
@@ -165,7 +168,8 @@ PrimaryGenerator::~PrimaryGenerator()
 
 void PrimaryGenerator::GeneratePrimaryVertex(G4Event *anEvent)
 {
-    if (!fRegistered) {
+    if (!fRegistered)
+    {
         Register(gRootTree->GetTree());
         fRegistered = true;
     }
@@ -174,15 +178,18 @@ void PrimaryGenerator::GeneratePrimaryVertex(G4Event *anEvent)
 
     G4ParticleTable *particleTable = G4ParticleTable::GetParticleTable();
 
-    if (!fTargetInfo) {
+    if (!fTargetInfo)
+    {
         G4VPhysicalVolume *physiTargetCon = G4PhysicalVolumeStore::GetInstance()->GetVolume("Target Container");
         G4LogicalVolume *logicTarget = G4LogicalVolumeStore::GetInstance()->GetVolume("TargetLV");
 
-        if (physiTargetCon) fTargetCenter = physiTargetCon->GetObjectTranslation().z();
+        if (physiTargetCon)
+            fTargetCenter = physiTargetCon->GetObjectTranslation().z();
 
         G4Tubs *solidTarget = NULL;
 
-        if (logicTarget) solidTarget = dynamic_cast<G4Tubs *>(logicTarget->GetSolid());
+        if (logicTarget)
+            solidTarget = dynamic_cast<G4Tubs *>(logicTarget->GetSolid());
 
         if (solidTarget)
             fTargetHalfL = solidTarget->GetZHalfLength();
@@ -196,13 +203,16 @@ void PrimaryGenerator::GeneratePrimaryVertex(G4Event *anEvent)
 
     double x, y, z, theta_l, phi_l;
 
-    if (fEventType == "point") {
+    if (fEventType == "point")
+    {
         x = fReactX;
         y = fReactY;
         z = fReactZ;
         theta_l = fReactTheta;
         phi_l = fReactPhi;
-    } else {
+    }
+    else
+    {
         x = G4RandGauss::shoot(0, 0.08) * mm;
         y = G4RandGauss::shoot(0, 0.08) * mm;
         z = fTargetCenter + fTargetHalfL * 2 * (0.5 - G4UniformRand());
@@ -216,19 +226,25 @@ void PrimaryGenerator::GeneratePrimaryVertex(G4Event *anEvent)
     double cosang = cos(theta_l);
     double p_l = 0, e_l = 0, a = 0;
 
-    if (fEventType == "elastic") { // me is not ignored
+    if (fEventType == "elastic")
+    { // me is not ignored
         p_l = (P * M / (E + M - P * cosang)) * (((E + M) * sqrt(1 - (me / M) * (me / M) * (1 - cosang * cosang)) + (E + (me / M) * me) * cosang) / (E + M + P * cosang));
         e_l = sqrt(p_l * p_l + me * me);
-    } else if (fEventType == "moller") {
+    }
+    else if (fEventType == "moller")
+    {
         a = (E - me) / (E + me);
         e_l = me * (1 + a * cosang * cosang) / (1 - a * cosang * cosang);
         p_l = sqrt(e_l * e_l - me * me);
-    } else if (fEventType == "point") {
+    }
+    else if (fEventType == "point")
+    {
         e_l = E;
         p_l = sqrt(e_l * e_l - me * me);
     }
 
-    if (e_l > E) G4cout << "WARNING: super-elastic event found" << G4endl;
+    if (e_l > E)
+        G4cout << "WARNING: super-elastic event found" << G4endl;
 
     G4PrimaryVertex *vertexL = new G4PrimaryVertex(x, y, z, 0);
     G4PrimaryParticle *particleL = new G4PrimaryParticle(particleTable->FindParticle("e-"));
@@ -251,9 +267,10 @@ void PrimaryGenerator::GeneratePrimaryVertex(G4Event *anEvent)
     fPhi[fN] = phi_l;
     fN++;
 
-    if (fEventType == "moller") {
+    if (fEventType == "moller")
+    {
         double e_l2 = E - e_l;
-        double p_l2 = sqrt(e_l2 * e_l2  - me * me);
+        double p_l2 = sqrt(e_l2 * e_l2 - me * me);
         double theta_l2 = asin(p_l * sin(theta_l) / p_l2);
         double phi_l2 = phi_l + pi;
 
@@ -277,16 +294,21 @@ void PrimaryGenerator::GeneratePrimaryVertex(G4Event *anEvent)
         fTheta[fN] = theta_l2;
         fPhi[fN] = phi_l2;
         fN++;
-    } else if (fRecoilOn) {
+    }
+    else if (fRecoilOn)
+    {
         double theta_h = atan(p_l * sin(theta_l) / (P - p_l * cosang));
 
-        if (theta_h < 0) theta_h = theta_h + twopi;
+        if (theta_h < 0)
+            theta_h = theta_h + twopi;
 
-        if (theta_h > twopi) theta_h = theta_h - twopi;
+        if (theta_h > twopi)
+            theta_h = theta_h - twopi;
 
         double phi_h = phi_l + pi;
 
-        if (phi_h > twopi) phi_h = phi_h - twopi;
+        if (phi_h > twopi)
+            phi_h = phi_h - twopi;
 
         double p_h = sqrt(P * P - 2 * P * p_l * cosang + p_l * p_l);
         double e_h = sqrt(p_h * p_h + M * M);
@@ -335,7 +357,8 @@ void PrimaryGenerator::Print() const
 {
     G4int prec = G4cout.precision(3);
 
-    for (int i = 0; i < fN; i++) {
+    for (int i = 0; i < fN; i++)
+    {
         G4cout << std::setw(10) << fPID[i] << " ";
         G4cout << std::setw(5) << G4BestUnit(fX[i], "Length") << " " << std::setw(5) << G4BestUnit(fY[i], "Length") << " " << std::setw(5) << G4BestUnit(fZ[i], "Length") << " ";
         G4cout << std::setw(5) << G4BestUnit(fE[i], "Energy") << " " << std::setw(8) << G4BestUnit(fMomentum[i], "Energy") << " ";
@@ -350,7 +373,8 @@ void PrimaryGenerator::Print() const
 
 void PrimaryGenerator::Clear()
 {
-    for (int i = 0; i < fN; i++) {
+    for (int i = 0; i < fN; i++)
+    {
         fPID[i] = -9999;
         fX[i] = 1e+38;
         fY[i] = 1e+38;
@@ -379,9 +403,10 @@ PRadPrimaryGenerator::PRadPrimaryGenerator(G4String type, G4bool rec, G4String p
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-PRadPrimaryGenerator::PRadPrimaryGenerator(G4String type, G4bool rec, G4String par, G4String path, G4String pile_up_profile, G4String target_profile): PrimaryGenerator(), fEventType(type), fRecoilOn(rec), fRecoilParticle(par), fPileUpProfile(NULL), fTargetProfile(NULL), fZGenerator(NULL), fPseRan(NULL), fFoamI(NULL)
+PRadPrimaryGenerator::PRadPrimaryGenerator(G4String type, G4bool rec, G4String par, G4String path, G4String pile_up_profile, G4String target_profile) : PrimaryGenerator(), fEventType(type), fRecoilOn(rec), fRecoilParticle(par), fPileUpProfile(NULL), fTargetProfile(NULL), fZGenerator(NULL), fPseRan(NULL), fFoamI(NULL)
 {
-    if (!pile_up_profile.empty()) {
+    if (!pile_up_profile.empty())
+    {
         fPileUpProfile = new TFile(pile_up_profile.c_str(), "READ");
         fClusterNumber = (TH1D *)fPileUpProfile->Get("cluster_number");
         fClusterEvsTheta = (TH2D *)fPileUpProfile->Get("signal_cluster_E_theta");
@@ -390,7 +415,8 @@ PRadPrimaryGenerator::PRadPrimaryGenerator(G4String type, G4bool rec, G4String p
     if (!target_profile.empty())
         LoadTargetProfile(target_profile);
 
-    if (path.empty()) {
+    if (path.empty())
+    {
         if (fEventType == "elastic")
             path = "epelastic.dat";
         else if (fEventType == "moller")
@@ -398,7 +424,8 @@ PRadPrimaryGenerator::PRadPrimaryGenerator(G4String type, G4bool rec, G4String p
     }
 
     // only open file, do not read the whole file into memory
-    if (!fParser.OpenFile(path)) {
+    if (!fParser.OpenFile(path))
+    {
         G4cout << "ERROR: failed to read event file " << "\"" << path << "\"" << G4endl;
         exit(1);
     }
@@ -425,7 +452,8 @@ PRadPrimaryGenerator::~PRadPrimaryGenerator()
 
 void PRadPrimaryGenerator::GeneratePrimaryVertex(G4Event *anEvent)
 {
-    if (!fRegistered) {
+    if (!fRegistered)
+    {
         Register(gRootTree->GetTree());
         fRegistered = true;
     }
@@ -434,11 +462,13 @@ void PRadPrimaryGenerator::GeneratePrimaryVertex(G4Event *anEvent)
 
     G4ParticleTable *particleTable = G4ParticleTable::GetParticleTable();
 
-    if (!fTargetInfo) {
+    if (!fTargetInfo)
+    {
         G4VPhysicalVolume *physiTargetCon = G4PhysicalVolumeStore::GetInstance()->GetVolume("Target Container");
         G4LogicalVolume *logicTarget = G4LogicalVolumeStore::GetInstance()->GetVolume("TargetLV");
 
-        if (physiTargetCon) fTargetCenter = physiTargetCon->GetObjectTranslation().z();
+        if (physiTargetCon)
+            fTargetCenter = physiTargetCon->GetObjectTranslation().z();
 
         G4Tubs *solidTarget = NULL;
 
@@ -453,13 +483,17 @@ void PRadPrimaryGenerator::GeneratePrimaryVertex(G4Event *anEvent)
         fTargetInfo = true;
     }
 
-    if (fEventType == "inelastic") {
+    if (fEventType == "inelastic")
+    {
         int pid[4];
         double p[4][3];
 
-        while (fParser.ParseLine()) {
-            if (!fParser.CheckElements(16))  continue;
-            else {
+        while (fParser.ParseLine())
+        {
+            if (!fParser.CheckElements(16))
+                continue;
+            else
+            {
                 fParser >> pid[0] >> p[0][0] >> p[0][1] >> p[0][2] >> pid[1] >> p[1][0] >> p[1][1] >> p[1][2] >> pid[2] >> p[2][0] >> p[2][1] >> p[2][2] >> pid[3] >> p[3][0] >> p[3][1] >> p[3][2];
                 break;
             }
@@ -469,8 +503,10 @@ void PRadPrimaryGenerator::GeneratePrimaryVertex(G4Event *anEvent)
         double y = G4RandGauss::shoot(0, 0.08) * mm;
         double z = GenerateZ();
 
-        for (int i = 0; i < 4; i++) {
-            if (p[i][2] <= 0.) continue;
+        for (int i = 0; i < 4; i++)
+        {
+            if (p[i][2] <= 0.)
+                continue;
 
             G4PrimaryParticle *particleL = new G4PrimaryParticle(pid[i], p[i][0], p[i][1], p[i][2]);
             G4PrimaryVertex *vertexL = new G4PrimaryVertex(x, y, z, 0);
@@ -495,10 +531,12 @@ void PRadPrimaryGenerator::GeneratePrimaryVertex(G4Event *anEvent)
     double e_h = 0, theta_h = 0, phi_h = 0;
     double e_p = 0, theta_p = 0, phi_p = 0;
 
-    while (fParser.ParseLine()) {
+    while (fParser.ParseLine())
+    {
         if (!fParser.CheckElements(9))
             continue;
-        else {
+        else
+        {
             fParser >> e_l >> theta_l >> phi_l >> e_h >> theta_h >> phi_h >> e_p >> theta_p >> phi_p;
             break;
         }
@@ -531,7 +569,8 @@ void PRadPrimaryGenerator::GeneratePrimaryVertex(G4Event *anEvent)
     fPhi[fN] = phi_l;
     fN++;
 
-    if (fRecoilOn || fEventType == "moller") {
+    if (fRecoilOn || fEventType == "moller")
+    {
         G4PrimaryVertex *vertexH = new G4PrimaryVertex(x, y, z, 0);
         G4PrimaryParticle *particleH = NULL;
 
@@ -562,7 +601,8 @@ void PRadPrimaryGenerator::GeneratePrimaryVertex(G4Event *anEvent)
         fN++;
     }
 
-    if (e_p > 0) {
+    if (e_p > 0)
+    {
         G4PrimaryVertex *vertexP = new G4PrimaryVertex(x, y, z, 0);
         G4PrimaryParticle *particleP = new G4PrimaryParticle(particleTable->FindParticle("gamma"));
         double kx_p = sin(theta_p) * cos(phi_p);
@@ -585,13 +625,15 @@ void PRadPrimaryGenerator::GeneratePrimaryVertex(G4Event *anEvent)
         fN++;
     }
 
-    if (fPileUpProfile && G4UniformRand() < 0.0202) {
+    if (fPileUpProfile && G4UniformRand() < 0.0202)
+    {
         int n_pile_up = int(fClusterNumber->GetRandom());
 
         if (fN + n_pile_up > MaxN)
             n_pile_up = MaxN - fN;
 
-        for (int i = 0; i < n_pile_up; i++) {
+        for (int i = 0; i < n_pile_up; i++)
+        {
             double e_add, theta_add;
             fClusterEvsTheta->GetRandom2(theta_add, e_add);
 
@@ -627,7 +669,8 @@ void PRadPrimaryGenerator::GeneratePrimaryVertex(G4Event *anEvent)
 
 void PRadPrimaryGenerator::LoadTargetProfile(const std::string &path)
 {
-    if (path.empty()) return;
+    if (path.empty())
+        return;
 
     ConfigParser c_parser;
     c_parser.ReadFile(path);
@@ -637,13 +680,15 @@ void PRadPrimaryGenerator::LoadTargetProfile(const std::string &path)
     density.clear();
     double tempz, tempd;
 
-    while (c_parser.ParseLine()) {
+    while (c_parser.ParseLine())
+    {
         if (!c_parser.CheckElements(2))
             continue;
 
         c_parser >> tempz >> tempd;
 
-        if (!z.empty() && tempz * 10.0 <= z.back()) continue;
+        if (!z.empty() && tempz * 10.0 <= z.back())
+            continue;
 
         // convert z to mm, and convert density to H_atom/cm^3
         z.push_back(tempz * 10.0);
@@ -659,12 +704,12 @@ void PRadPrimaryGenerator::LoadTargetProfile(const std::string &path)
 
     fZGenerator = new TFoam("Z Generator");
     fZGenerator->SetkDim(1);
-    fZGenerator->SetnCells(10000); // Set number of cells
-    fZGenerator->SetnSampl(500); // Set number of samples
-    fZGenerator->SetOptRej(1); // Unweighted events in MC generation
-    fZGenerator->SetRho(fFoamI); // Set distribution function
+    fZGenerator->SetnCells(10000);   // Set number of cells
+    fZGenerator->SetnSampl(500);     // Set number of samples
+    fZGenerator->SetOptRej(1);       // Unweighted events in MC generation
+    fZGenerator->SetRho(fFoamI);     // Set distribution function
     fZGenerator->SetPseRan(fPseRan); // Set random number generator
-    fZGenerator->SetChat(0); // Set "chat level" in the standard output
+    fZGenerator->SetChat(0);         // Set "chat level" in the standard output
     fZGenerator->Initialize();
 }
 
@@ -672,12 +717,14 @@ void PRadPrimaryGenerator::LoadTargetProfile(const std::string &path)
 
 double PRadPrimaryGenerator::GenerateZ()
 {
-    if (fZGenerator) {
+    if (fZGenerator)
+    {
         double rvect[1];
         fZGenerator->MakeEvent();
         fZGenerator->GetMCvect(rvect);
         return fTargetCenter + fZMin + (fZMax - fZMin) * rvect[0];
-    } else
+    }
+    else
         return fTargetCenter + fTargetHalfL * 2 * (0.5 - G4UniformRand());
 }
 
@@ -707,9 +754,112 @@ double TargetProfileIntegrand::Density(int, double *arg)
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
+X17PrimaryGenerator::X17PrimaryGenerator(G4String type, G4bool rec, G4String par, G4String path) : PRadPrimaryGenerator(type, rec, par)
+{
+    // OpenFile doesn't read the whole file into memory
+    if (path.empty() || !fParser.OpenFile(path))
+    {
+        G4cout << "ERROR: failed to read event file " << "\"" << path << "\"" << G4endl;
+        exit(1);
+    }
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+X17PrimaryGenerator::~X17PrimaryGenerator()
+{
+    //
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+void X17PrimaryGenerator::Register(TTree *tree)
+{
+    PRadPrimaryGenerator::Register(tree);
+    tree->Branch("GUN.weight", &fWeight, "GUN.weight/D");
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+X17PrimaryGenerator::GeneratePrimaryVertex(G4Event *event)
+{
+    if (!fRegistered)
+    {
+        Register(gRootTree->GetTree());
+        fRegistered = true;
+    }
+
+    Clear();
+
+    G4ParticleTable *particleTable = G4ParticleTable::GetParticleTable();
+
+    // Read in energy and momentum components (lab frame) for X decay electron, X decay positron, and recoil electron, then event weight
+    double eE[3];
+    double epx[3];
+    double epy[3];
+    double epz[3];
+
+    while (fParser.ParseLine())
+    {
+        if (!fParser.CheckElements(13))
+            continue;
+        else
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                fParser >> eE[i] >> epx[i] >> epy[i] >> epz[i];
+            }
+            fParser >> fWeight;
+            break;
+        }
+    }
+
+    double x = G4RandGauss::shoot(0, 0.08) * mm;
+    double y = G4RandGauss::shoot(0, 0.08) * mm;
+    double z = fTargetCenter + fTargetHalfL * 2 * (0.5 - G4UniformRand());
+
+    for (int i = 0; i < 3; i++)
+    {
+        G4int pdg = 0;
+        if(i%2==0)
+        {
+            // First and third particles read in are electrons (i==0 and i==2)
+            pdg = particleTable->FindParticle("e-").GetPDGEncoding();
+        }
+        else
+        {
+            // Second particle read in is positron (i==1)
+            pdg = particleTable->FindParticle("e-").GetAntiPDGEncoding();
+        }
+        G4PrimaryParticle *particleL = new G4PrimaryParticle(pdg, epx[i], epy[i], epz[i]);
+        G4PrimaryVertex *vertexL = new G4PrimaryVertex(x, y, z, 0);
+        vertexL->SetPrimary(particleL);
+        anEvent->AddPrimaryVertex(vertexL);
+
+        fPID[fN] = pid[i];
+        fX[fN] = x;
+        fY[fN] = y;
+        fZ[fN] = z;
+        fE[fN] = particleL->GetTotalEnergy();
+        fMomentum[fN] = particleL->GetTotalMomentum();
+        fTheta[fN] = particleL->GetMomentum().theta();
+        fPhi[fN] = particleL->GetMomentum().phi();
+        fN++;
+    }
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
 DRadPrimaryGenerator::DRadPrimaryGenerator(G4String type, G4bool rec, G4String par, G4String path) : PRadPrimaryGenerator(type, rec, par)
 {
-    if (path.empty()) {
+    if (path.empty())
+    {
         if (fEventType == "elastic")
             path = "edelastic.dat";
         else if (fEventType == "moller")
@@ -719,7 +869,8 @@ DRadPrimaryGenerator::DRadPrimaryGenerator(G4String type, G4bool rec, G4String p
     }
 
     // OpenFile doesn't read the whole file into memory
-    if (!fParser.OpenFile(path)) {
+    if (!fParser.OpenFile(path))
+    {
         G4cout << "ERROR: failed to read event file " << "\"" << path << "\"" << G4endl;
         exit(1);
     }
@@ -736,7 +887,8 @@ DRadPrimaryGenerator::~DRadPrimaryGenerator()
 
 void DRadPrimaryGenerator::GeneratePrimaryVertex(G4Event *anEvent)
 {
-    if (!fRegistered) {
+    if (!fRegistered)
+    {
         Register(gRootTree->GetTree());
         fRegistered = true;
     }
@@ -745,11 +897,13 @@ void DRadPrimaryGenerator::GeneratePrimaryVertex(G4Event *anEvent)
 
     G4ParticleTable *particleTable = G4ParticleTable::GetParticleTable();
 
-    if (!fTargetInfo) {
+    if (!fTargetInfo)
+    {
         G4VPhysicalVolume *physiTargetCon = G4PhysicalVolumeStore::GetInstance()->GetVolume("Target Container");
         G4LogicalVolume *logicTarget = G4LogicalVolumeStore::GetInstance()->GetVolume("TargetLV");
 
-        if (physiTargetCon) fTargetCenter = physiTargetCon->GetObjectTranslation().z();
+        if (physiTargetCon)
+            fTargetCenter = physiTargetCon->GetObjectTranslation().z();
 
         G4Tubs *solidTarget = NULL;
 
@@ -768,10 +922,12 @@ void DRadPrimaryGenerator::GeneratePrimaryVertex(G4Event *anEvent)
     double e_h = 0, theta_h = 0, phi_h = 0;
     double e_p = 0, theta_p = 0, phi_p = 0;
 
-    while (fParser.ParseLine()) {
+    while (fParser.ParseLine())
+    {
         if (!fParser.CheckElements(9))
             continue;
-        else {
+        else
+        {
             fParser >> e_l >> theta_l >> phi_l >> e_h >> theta_h >> phi_h >> e_p >> theta_p >> phi_p;
             break;
         }
@@ -804,7 +960,8 @@ void DRadPrimaryGenerator::GeneratePrimaryVertex(G4Event *anEvent)
     fPhi[fN] = phi_l;
     fN++;
 
-    if (fRecoilOn || fEventType == "moller" || fEventType == "disintegration") {
+    if (fRecoilOn || fEventType == "moller" || fEventType == "disintegration")
+    {
         G4PrimaryVertex *vertexH = new G4PrimaryVertex(x, y, z, 0);
         G4PrimaryParticle *particleH = NULL;
 
@@ -837,12 +994,13 @@ void DRadPrimaryGenerator::GeneratePrimaryVertex(G4Event *anEvent)
         fN++;
     }
 
-    if (e_p > 0) {
+    if (e_p > 0)
+    {
         G4PrimaryVertex *vertexP = new G4PrimaryVertex(x, y, z, 0);
         G4PrimaryParticle *particleP = NULL;
 
         if (fEventType == "disintegration")
-            //particleP = new G4PrimaryParticle(particleTable->FindParticle("neutron"));
+            // particleP = new G4PrimaryParticle(particleTable->FindParticle("neutron"));
             return;
         else
             particleP = new G4PrimaryParticle(particleTable->FindParticle("gamma"));
@@ -899,7 +1057,8 @@ DeuteronDisintegration::~DeuteronDisintegration()
 
 void DeuteronDisintegration::GeneratePrimaryVertex(G4Event *anEvent)
 {
-    if (!fRegistered) {
+    if (!fRegistered)
+    {
         Register(gRootTree->GetTree());
         fRegistered = true;
     }
@@ -908,15 +1067,18 @@ void DeuteronDisintegration::GeneratePrimaryVertex(G4Event *anEvent)
 
     G4ParticleTable *particleTable = G4ParticleTable::GetParticleTable();
 
-    if (!fTargetInfo) {
+    if (!fTargetInfo)
+    {
         G4VPhysicalVolume *physiTargetCon = G4PhysicalVolumeStore::GetInstance()->GetVolume("Target Container");
         G4LogicalVolume *logicTarget = G4LogicalVolumeStore::GetInstance()->GetVolume("TargetLV");
 
-        if (physiTargetCon) fTargetCenter = physiTargetCon->GetObjectTranslation().z();
+        if (physiTargetCon)
+            fTargetCenter = physiTargetCon->GetObjectTranslation().z();
 
         G4Tubs *solidTarget = NULL;
 
-        if (logicTarget) solidTarget = dynamic_cast<G4Tubs *>(logicTarget->GetSolid());
+        if (logicTarget)
+            solidTarget = dynamic_cast<G4Tubs *>(logicTarget->GetSolid());
 
         if (solidTarget)
             fTargetHalfL = solidTarget->GetZHalfLength();
@@ -987,15 +1149,18 @@ void DeuteronDisintegration::GeneratePrimaryVertex(G4Event *anEvent)
     double v = pp / ee;
 
     double theta_cm = acos(-1.0 + 2.0 * G4UniformRand());
-    //double theta_cm = pi * G4UniformRand();
+    // double theta_cm = pi * G4UniformRand();
 
     G4ThreeVector vf_p(pcm_p * sin(theta_cm), 0, gamma * (pcm_p * cos(theta_cm) + v * ecm_p)); // NOTE: not lab system
-    double dtheta = vf_p.theta(); // angle between proton momentum and virtual photon momentum
+    double dtheta = vf_p.theta();                                                              // angle between proton momentum and virtual photon momentum
 
-    if (vq.theta() - dtheta > 0) {
+    if (vq.theta() - dtheta > 0)
+    {
         vf_p.setTheta(vq.theta() - dtheta);
         vf_p.setPhi(vq.phi());
-    } else {
+    }
+    else
+    {
         vf_p.setTheta(dtheta - vq.theta());
         vf_p.setPhi(vq.phi() + pi);
     }
@@ -1076,17 +1241,18 @@ CosmicsGenerator::CosmicsGenerator() : G4VPrimaryGenerator(), fRegistered(false)
 
     fETGenerator = new TFoam("ET Generator");
     fETGenerator->SetkDim(2);
-    fETGenerator->SetnCells(20000); // Set number of cells
-    fETGenerator->SetnSampl(1000); // Set number of samples
-    fETGenerator->SetOptRej(1); // Unweighted events in MC generation
-    fETGenerator->SetRho(fFoamI); // Set distribution function
+    fETGenerator->SetnCells(20000);   // Set number of cells
+    fETGenerator->SetnSampl(1000);    // Set number of samples
+    fETGenerator->SetOptRej(1);       // Unweighted events in MC generation
+    fETGenerator->SetRho(fFoamI);     // Set distribution function
     fETGenerator->SetPseRan(fPseRan); // Set random number generator
-    fETGenerator->SetChat(0); // Set "chat level" in the standard output
+    fETGenerator->SetChat(0);         // Set "chat level" in the standard output
     fETGenerator->Initialize();
 
     fN = 0;
 
-    for (int i = 0; i < MaxN; i++) {
+    for (int i = 0; i < MaxN; i++)
+    {
         fPID[i] = -9999;
         fX[i] = 1e+38;
         fY[i] = 1e+38;
@@ -1109,7 +1275,8 @@ CosmicsGenerator::~CosmicsGenerator()
 
 void CosmicsGenerator::GeneratePrimaryVertex(G4Event *anEvent)
 {
-    if (!fRegistered) {
+    if (!fRegistered)
+    {
         Register(gRootTree->GetTree());
         fRegistered = true;
     }
@@ -1186,7 +1353,8 @@ void CosmicsGenerator::Print() const
 {
     G4int prec = G4cout.precision(3);
 
-    for (int i = 0; i < fN; i++) {
+    for (int i = 0; i < fN; i++)
+    {
         G4cout << std::setw(10) << fPID[i] << " ";
         G4cout << std::setw(5) << G4BestUnit(fX[i], "Length") << " " << std::setw(5) << G4BestUnit(fY[i], "Length") << " " << std::setw(5) << G4BestUnit(fZ[i], "Length") << " ";
         G4cout << std::setw(5) << G4BestUnit(fE[i], "Energy") << " " << std::setw(8) << G4BestUnit(fMomentum[i], "Energy") << " ";
@@ -1201,7 +1369,8 @@ void CosmicsGenerator::Print() const
 
 void CosmicsGenerator::Clear()
 {
-    for (int i = 0; i < fN; i++) {
+    for (int i = 0; i < fN; i++)
+    {
         fPID[i] = -9999;
         fX[i] = 1e+38;
         fY[i] = 1e+38;
@@ -1217,7 +1386,7 @@ void CosmicsGenerator::Clear()
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-CosmicsIntegrand::CosmicsIntegrand(CosmicsGenerator *gen, double e0, double eps, double rd, double nn) :  E0(e0), epsilon(eps), Rd(rd), n(nn)
+CosmicsIntegrand::CosmicsIntegrand(CosmicsGenerator *gen, double e0, double eps, double rd, double nn) : E0(e0), epsilon(eps), Rd(rd), n(nn)
 {
     fEMin = gen->fEMin;
     fEMax = gen->fEMax;

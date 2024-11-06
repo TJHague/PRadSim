@@ -29,6 +29,7 @@
 //   Mar 2017, C. Gu, Add for DRad configuration.
 //   Apr 2017, W. Xiong, Add target thickness profile.
 //   May 2017, C. Gu, Add Deuteron disintegration.
+//   Nov 2024, T. J. Hague, Add X17PrimaryGenerator
 //
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -150,6 +151,21 @@ protected:
 
     ConfigParser fParser;
 };
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+class X17PrimaryGenerator : public PRadPrimaryGenerator
+{
+    public:
+    X17PrimaryGenerator(G4String type, G4bool rec, G4String par, G4String path);
+    virtual ~X17PrimaryGenerator();
+
+    virtual void GeneratePrimaryVertex(G4Event *);
+
+    protected:
+    void Register(TTree *);
+    double fWeight;
+}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 

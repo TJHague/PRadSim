@@ -29,6 +29,7 @@
 //   Aug 2012, C. Peng, Original version.
 //   Jan 2017, C. Gu, Rewrite with ROOT support.
 //   Mar 2017, C. Gu, Add DRad configuration.
+//   Nov 2024, T. J. Hague, Add X17 configuration
 //
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

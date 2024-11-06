@@ -49,7 +49,7 @@
 
 PrimaryGeneratorAction::PrimaryGeneratorAction(G4String conf) : G4VUserPrimaryGeneratorAction(), fConfig(conf), fGunType("ring"), fEventType("elastic"), fE(1100 * MeV), fX(0), fY(0), fZ(-300.0 * cm), fTheta(0), fPhi(0), fThetaLo(0.5 * deg), fThetaHi(6.5 * deg), fEnpLo(1e-4), fEnpHi(1), fPrimaryGenerator(NULL)
 {
-    if (fConfig != "prad" && fConfig != "drad")
+    if (fConfig != "prad" && fConfig != "drad" && fConfig != "X17")
         fConfig = "prad";
 
     fRecoilParticle.clear();
@@ -89,6 +89,8 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event *anEvent)
                 fPrimaryGenerator = new CosmicsGenerator();
             else
                 fPrimaryGenerator = new PRadPrimaryGenerator(fEventType, false, "proton", fEventFile, fPileUpProfile, fTargetProfile);
+        } else if(fConfig=="X17"){
+            fPrimaryGenerator = new X17PrimaryGenerator(fEventType, false, "none", fEventFile);
         } else {
             if (!recoilon) fRecoilParticle = "deuteron";
 
