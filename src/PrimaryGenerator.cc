@@ -776,7 +776,7 @@ X17PrimaryGenerator::~X17PrimaryGenerator()
 void X17PrimaryGenerator::Register(TTree *tree)
 {
     PRadPrimaryGenerator::Register(tree);
-    tree->Branch("GUN.weight", &fWeight, "GUN.weight/D");
+    // tree->Branch("GUN.weight", &fWeight, "GUN.weight/D");
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -801,7 +801,7 @@ void X17PrimaryGenerator::GeneratePrimaryVertex(G4Event *anEvent)
 
     while (fParser.ParseLine())
     {
-        if (!fParser.CheckElements(13))
+        if (!fParser.CheckElements(12))
             continue;
         else
         {
@@ -809,7 +809,7 @@ void X17PrimaryGenerator::GeneratePrimaryVertex(G4Event *anEvent)
             {
                 fParser >> eE[i] >> epx[i] >> epy[i] >> epz[i];
             }
-            fParser >> fWeight;
+            // fParser >> fWeight;
             break;
         }
     }
