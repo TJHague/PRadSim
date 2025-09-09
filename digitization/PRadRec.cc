@@ -154,7 +154,7 @@ int main(int argc, char **argv)
     std::vector<std::vector<double>> HC_GEMX;
     std::vector<std::vector<double>> HC_GEMY;
     std::vector<std::vector<double>> HC_GEMZ;
-    std::vector<std::vector<int>> HC_GEMDID;
+    // std::vector<std::vector<int>> HC_GEMDID;
     // retrieve part of the cluster information
     t->Branch("HC.N", &N_HC, "HC.N/I");
     t->Branch("HC.X", X_HC, "HC.X[HC.N]/D");
@@ -170,7 +170,7 @@ int main(int argc, char **argv)
     t->Branch("HC.GEM.X", &HC_GEMX);
     t->Branch("HC.GEM.Y", &HC_GEMY);
     t->Branch("HC.GEM.Z", &HC_GEMZ);
-    t->Branch("HC.GEM.DID", &HC_GEMDID);
+    // t->Branch("HC.GEM.DID", &HC_GEMDID);
 
     // t->Branch("GEM.N", &N_GEM, "GEM.N/I");
     // t->Branch("GEM.X", X_GEM, "GEM.X[GEM.N]/D");
@@ -220,14 +220,14 @@ int main(int argc, char **argv)
             HC_GEMX.resize(N_HC);
             HC_GEMY.resize(N_HC);
             HC_GEMZ.resize(N_HC);
-            HC_GEMDID.resize(N_HC);
+            // HC_GEMDID.resize(N_HC);
 
             // Clear the inner vectors
             for (int j = 0; j < N_HC; ++j) {
                 HC_GEMX[j].clear();
                 HC_GEMY[j].clear();
                 HC_GEMZ[j].clear();
-                HC_GEMDID[j].clear();
+                // HC_GEMDID[j].clear();
             }
 
             for (int j = 0; j < N_HC; ++j) {
@@ -246,14 +246,14 @@ int main(int argc, char **argv)
                 HC_GEMX[j].resize(HC_NGEM[j]);
                 HC_GEMY[j].resize(HC_NGEM[j]);
                 HC_GEMZ[j].resize(HC_NGEM[j]);
-                HC_GEMDID[j].resize(HC_NGEM[j]);
+                // HC_GEMDID[j].resize(HC_NGEM[j]);
 
                 for(int k=0; k<HC_NGEM[j]; k++) {
                     GEMHit gh = matched[j].gems.GetGEMHit(k);
                     HC_GEMX[j][k] = gh.x;
                     HC_GEMY[j][k] = gh.y;
                     HC_GEMZ[j][k] = gh.z;
-                    HC_GEMDID[j][k] = gh.did;
+                    // HC_GEMDID[j][k] = gh.did;
                 }
                 // if (matched[j].gem1.empty() && matched[j].gem2.empty()) {
                 //     X_GEM[j] = -10000;
