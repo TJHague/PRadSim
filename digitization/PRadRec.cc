@@ -150,6 +150,7 @@ int main(int argc, char **argv)
 
     int N_HC, N_GEM, CID[100], DID_GEM[100];
     double E[100], X_HC[100], Y_HC[100], Z_HC[100], X_GEM[100], Y_GEM[100], Z_GEM[100]; // maximum number of clusters, 100 is enough
+    double HC_NGEM, HC_GEMX[4], HC_GEMY[4], HC_GEMZ[4], HC_GEMDID[4];
     // retrieve part of the cluster information
     t->Branch("HC.N", &N_HC, "HC.N/I");
     t->Branch("HC.X", X_HC, "HC.X[HC.N]/D");
@@ -157,11 +158,19 @@ int main(int argc, char **argv)
     t->Branch("HC.Z", Z_HC, "HC.Z[HC.N]/D");
     t->Branch("HC.P", E, "HC.P[HC.N]/D");
     t->Branch("HC.CID", CID, "HC.CID[HC.N]/I");
-    t->Branch("GEM.N", &N_GEM, "GEM.N/I");
-    t->Branch("GEM.X", X_GEM, "GEM.X[GEM.N]/D");
-    t->Branch("GEM.Y", Y_GEM, "GEM.Y[GEM.N]/D");
-    t->Branch("GEM.Z", Z_GEM, "GEM.Z[GEM.N]/D");
-    t->Branch("GEM.DID", DID_GEM, "GEM.DID[GEM.N]/I");
+
+    // Only will save GEMs that matched to a HyCal cluster
+    t->Branch("HC.NGEM", &HC_NGEM, "HC.NGEM/D");
+    t->Branch("HC.GEM.X", HC_GEMX, "HC.GEM.X[HC.NGEM]/D");
+    t->Branch("HC.GEM.Y", HC_GEMY, "HC.GEM.Y[HC.NGEM]/D");
+    t->Branch("HC.GEM.Z", HC_GEMZ, "HC.GEM.Z[HC.NGEM]/D");
+    t->Branch("HC.GEM.DID", HC_GEMDID, "HC.GEM.DID[HC.NGEM]/I");
+
+    // t->Branch("GEM.N", &N_GEM, "GEM.N/I");
+    // t->Branch("GEM.X", X_GEM, "GEM.X[GEM.N]/D");
+    // t->Branch("GEM.Y", Y_GEM, "GEM.Y[GEM.N]/D");
+    // t->Branch("GEM.Z", Z_GEM, "GEM.Z[GEM.N]/D");
+    // t->Branch("GEM.DID", DID_GEM, "GEM.DID[GEM.N]/I");
 
     tgem->SetBranchAddress("GEM.N", &N_GEM);
     tgem->SetBranchAddress("GEM.X", X_GEM);
@@ -213,23 +222,32 @@ int main(int argc, char **argv)
                 Y_HC[j] = matched[j].hycal.y;
                 Z_HC[j] = matched[j].hycal.z;
 
-                if (matched[j].gem1.empty() && matched[j].gem2.empty()) {
-                    X_GEM[j] = -10000;
-                    Y_GEM[j] = -10000;
-                    Z_GEM[j] = -10000;
-                } else if (matched[j].gem1.empty()) {
-                    X_GEM[j] = matched[j].gem2[0].x;
-                    Y_GEM[j] = matched[j].gem2[0].y;
-                    Z_GEM[j] = matched[j].gem2[0].z;
-                } else if (matched[j].gem2.empty()) {
-                    X_GEM[j] = matched[j].gem1[0].x;
-                    Y_GEM[j] = matched[j].gem1[0].y;
-                    Z_GEM[j] = matched[j].gem1[0].z;
-                } else {
-                    X_GEM[j] = 0.5 * (matched[j].gem1[0].x + matched[j].gem2[0].x);
-                    Y_GEM[j] = 0.5 * (matched[j].gem1[0].y + matched[j].gem2[0].y);
-                    Z_GEM[j] = 0.5 * (matched[j].gem1[0].z + matched[j].gem2[0].z);
+                HC_NGEM = matched.gems.GetNGEMHits();
+
+                for(int k=0; k<HC_NGEM; k++) {
+                    GEMHit gh = matched[j].gems.GetGEMHit(k);
+                    HC_GEMX[k] = gh.x;
+                    HC_GEMY[k] = gh.y;
+                    HC_GEMZ[k] = gh.z;
+                    HC_GEMDID[k] = gh.did;
                 }
+                // if (matched[j].gem1.empty() && matched[j].gem2.empty()) {
+                //     X_GEM[j] = -10000;
+                //     Y_GEM[j] = -10000;
+                //     Z_GEM[j] = -10000;
+                // } else if (matched[j].gem1.empty()) {
+                //     X_GEM[j] = matched[j].gem2[0].x;
+                //     Y_GEM[j] = matched[j].gem2[0].y;
+                //     Z_GEM[j] = matched[j].gem2[0].z;
+                // } else if (matched[j].gem2.empty()) {
+                //     X_GEM[j] = matched[j].gem1[0].x;
+                //     Y_GEM[j] = matched[j].gem1[0].y;
+                //     Z_GEM[j] = matched[j].gem1[0].z;
+                // } else {
+                //     X_GEM[j] = 0.5 * (matched[j].gem1[0].x + matched[j].gem2[0].x);
+                //     Y_GEM[j] = 0.5 * (matched[j].gem1[0].y + matched[j].gem2[0].y);
+                //     Z_GEM[j] = 0.5 * (matched[j].gem1[0].z + matched[j].gem2[0].z);
+                // }
             }
         } else {
             N_HC = (int)hits.size();
