@@ -150,7 +150,11 @@ int main(int argc, char **argv)
 
     int N_HC, N_GEM, CID[100], DID_GEM[100];
     double E[100], X_HC[100], Y_HC[100], Z_HC[100], X_GEM[100], Y_GEM[100], Z_GEM[100]; // maximum number of clusters, 100 is enough
-    double HC_NGEM, HC_GEMX[4], HC_GEMY[4], HC_GEMZ[4], HC_GEMDID[4];
+    int HC_NGEM[100];
+    std::vector<std::vector<double>> HC_GEMX;
+    std::vector<std::vector<double>> HC_GEMY;
+    std::vector<std::vector<double>> HC_GEMZ;
+    std::vector<std::vector<int>> HC_GEMDID;
     // retrieve part of the cluster information
     t->Branch("HC.N", &N_HC, "HC.N/I");
     t->Branch("HC.X", X_HC, "HC.X[HC.N]/D");
@@ -160,11 +164,13 @@ int main(int argc, char **argv)
     t->Branch("HC.CID", CID, "HC.CID[HC.N]/I");
 
     // Only will save GEMs that matched to a HyCal cluster
-    t->Branch("HC.NGEM", &HC_NGEM, "HC.NGEM/D");
-    t->Branch("HC.GEM.X", HC_GEMX, "HC.GEM.X[HC.NGEM]/D");
-    t->Branch("HC.GEM.Y", HC_GEMY, "HC.GEM.Y[HC.NGEM]/D");
-    t->Branch("HC.GEM.Z", HC_GEMZ, "HC.GEM.Z[HC.NGEM]/D");
-    t->Branch("HC.GEM.DID", HC_GEMDID, "HC.GEM.DID[HC.NGEM]/I");
+    t->Branch("HC.NGEM", &HC_NGEM, "HC.NGEM/I");
+    // Store GEM information as std::vector<std::vector<double>> objects.
+    // Use object branches so nested vectors are written properly by ROOT.
+    t->Branch("HC.GEM.X", &HC_GEMX);
+    t->Branch("HC.GEM.Y", &HC_GEMY);
+    t->Branch("HC.GEM.Z", &HC_GEMZ);
+    t->Branch("HC.GEM.DID", &HC_GEMDID);
 
     // t->Branch("GEM.N", &N_GEM, "GEM.N/I");
     // t->Branch("GEM.X", X_GEM, "GEM.X[GEM.N]/D");
@@ -209,7 +215,20 @@ int main(int argc, char **argv)
             auto matched = det_match->Match(hits, gem1_hits, gem2_hits);
 
             N_HC = (int)matched.size();
-            N_GEM = (int)matched.size();
+            // N_GEM = (int)matched.size();
+
+            HC_GEMX.resize(N_HC);
+            HC_GEMY.resize(N_HC);
+            HC_GEMZ.resize(N_HC);
+            HC_GEMDID.resize(N_HC);
+
+            // Clear the inner vectors
+            for (int j = 0; j < N_HC; ++j) {
+                HC_GEMX[j].clear();
+                HC_GEMY[j].clear();
+                HC_GEMZ[j].clear();
+                HC_GEMDID[j].clear();
+            }
 
             for (int j = 0; j < N_HC; ++j) {
                 E[j] = EnergyCorrect(matched[j].hycal.E, matched[j].hycal.cid);
@@ -222,14 +241,19 @@ int main(int argc, char **argv)
                 Y_HC[j] = matched[j].hycal.y;
                 Z_HC[j] = matched[j].hycal.z;
 
-                HC_NGEM = matched.gems.GetNGEMHits();
+                HC_NGEM[j] = matched[j].gems.GetNGEMHits();
 
-                for(int k=0; k<HC_NGEM; k++) {
+                HC_GEMX[j].resize(HC_NGEM[j]);
+                HC_GEMY[j].resize(HC_NGEM[j]);
+                HC_GEMZ[j].resize(HC_NGEM[j]);
+                HC_GEMDID[j].resize(HC_NGEM[j]);
+
+                for(int k=0; k<HC_NGEM[j]; k++) {
                     GEMHit gh = matched[j].gems.GetGEMHit(k);
-                    HC_GEMX[k] = gh.x;
-                    HC_GEMY[k] = gh.y;
-                    HC_GEMZ[k] = gh.z;
-                    HC_GEMDID[k] = gh.did;
+                    HC_GEMX[j][k] = gh.x;
+                    HC_GEMY[j][k] = gh.y;
+                    HC_GEMZ[j][k] = gh.z;
+                    HC_GEMDID[j][k] = gh.did;
                 }
                 // if (matched[j].gem1.empty() && matched[j].gem2.empty()) {
                 //     X_GEM[j] = -10000;
