@@ -164,7 +164,7 @@ int main(int argc, char **argv)
     t->Branch("HC.CID", CID, "HC.CID[HC.N]/I");
 
     // Only will save GEMs that matched to a HyCal cluster
-    t->Branch("HC.NGEM", &HC_NGEM, "HC.NGEM[HC.N]/I");
+    t->Branch("HC.NGEM", HC_NGEM, "HC.NGEM[HC.N]/I");
     // Store GEM information as std::vector<std::vector<double>> objects.
     // Use object branches so nested vectors are written properly by ROOT.
     t->Branch("HC.GEM.X", &HC_GEMX);
